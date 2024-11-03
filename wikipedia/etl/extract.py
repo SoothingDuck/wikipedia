@@ -20,7 +20,6 @@ import csv
 import json
 
 
-
 class DumpExtractor(ABC):
     def __init__(self, dump):
         self._dump = dump
@@ -89,22 +88,14 @@ class DumpFileExtractor(DumpExtractor):
         )
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
-                redirectionwriter = csv.writer(
-                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
-                )
-                redirectionwriter.writerow(
-                    ["article_id", "article_title", "redirection_title"]
-                )
-
                 for article in self:
                     if article.redirect_title is not None:
-                        redirectionwriter.writerow(
-                            [
-                                article.id,
-                                article.title.strip(),
-                                article.redirect_title.strip(),
-                            ]
-                        )
+                        json.dump({
+                            "article_id": article.id,
+                            "article_title": article.title.strip(),
+                            "redirection_title": article.redirect_title.strip()
+                        }, jsonfile)
+                        jsonfile.write("\n")
 
     def extract_links(self, maxlength_article_title=2000):
         # Links
@@ -112,16 +103,16 @@ class DumpFileExtractor(DumpExtractor):
             self._directory_name, self.dump.link_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
-                linkwriter = csv.writer(
-                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
-                )
-                linkwriter.writerow(["article_id", "link_title"])
-
                 for article in self:
                     if article.redirect_title is None:
                         if len(article.title.strip()) <= maxlength_article_title:
                             for link in article.links:
-                                linkwriter.writerow([article.id, link.strip()])
+                                json.dump(
+                                    {
+                                        "article_id": article.id,
+                                        "link_title": link.strip()
+                                    }, jsonfile
+                                )
 
     def extract_infoboxes(self):
         # Categories
@@ -129,19 +120,15 @@ class DumpFileExtractor(DumpExtractor):
             self._directory_name, self.dump.infobox_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
-                infoboxwriter = csv.writer(
-                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
-                )
-
-                infoboxwriter.writerow(
-                    ["article_id", "article_title", "infobox"])
-
                 for article in self:
                     if article.redirect_title is None:
                         for infobox in article.infoboxes:
-                            infoboxwriter.writerow(
-                                [article.id, article.title.strip(), infobox.strip()]
-                            )
+                            json.dump({
+                                "article_id": article.id,
+                                "article_title": article.title.strip(),
+                                "infobox": infobox.strip()
+                            }, jsonfile)
+                            jsonfile.write("\n")
 
     def extract_categories(self):
         # Categories
@@ -149,18 +136,15 @@ class DumpFileExtractor(DumpExtractor):
             self._directory_name, self.dump.category_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
-                categorywriter = csv.writer(
-                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
-                )
-                categorywriter.writerow(
-                    ["article_id", "article_title", "category"])
-
                 for article in self:
                     if article.redirect_title is None:
                         for category in article.categories:
-                            categorywriter.writerow(
-                                [article.id, article.title.strip(), category.strip()]
-                            )
+                            json.dump({
+                                "article_id": article.id,
+                                "article_title": article.title.strip(),
+                                "category": category.strip()
+                            }, jsonfile)
+                            jsonfile.write("\n")
 
     def extract_portals(self):
         # Portals
@@ -168,15 +152,12 @@ class DumpFileExtractor(DumpExtractor):
             self._directory_name, self.dump.portal_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
-                portalwriter = csv.writer(
-                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
-                )
-                portalwriter.writerow(
-                    ["article_id", "article_title", "portal"])
-
                 for article in self:
                     if article.redirect_title is None:
                         for portal in article.portals:
-                            portalwriter.writerow(
-                                [article.id, article.title.strip(), portal.strip()]
-                            )
+                            json.dump({
+                                "article_id": article.id,
+                                "article_title": article.title.strip(),
+                                "portal": portal.strip()
+                            }, jsonfile)
+                            jsonfile.write("\n")

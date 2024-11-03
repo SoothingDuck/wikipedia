@@ -29,8 +29,7 @@ if "node" in sync_list:
         namespace INTEGER,
         text TEXT
     );
-    """
-    )
+    """)
 
     # %% Effacement des nodes
     con.sql("DELETE from nodes")
@@ -46,8 +45,7 @@ if "node" in sync_list:
         article_text
         FROM
         read_json('{config["default"]["data_directory"]}/dump/{lang}/nodes/*.json')
-    """
-    )
+    """)
 
 # %% Infoboxes
 if "infobox" in sync_list:
@@ -59,8 +57,7 @@ if "infobox" in sync_list:
         id INTEGER PRIMARY KEY,
         name VARCHAR
     );
-    """
-    )
+    """)
 
     # %% Effacement des nodes
     con.sql("DELETE from infobox_type")
@@ -77,23 +74,10 @@ if "infobox" in sync_list:
                 select
                 infobox,
                 count(*)
-                FROM read_csv(
-                    '{config["default"]["data_directory"]}/dump/{lang}/infoboxes/*.csv',
-                    delim=',',
-                    header=true,
-                    columns={{
-                        'id': 'INTEGER',
-                        'title': 'VARCHAR',
-                        'infobox': 'VARCHAR'
-                    }},
-                    quote='|',
-                    escape='',
-                    ignore_errors=true
-                )
+                FROM read_json('{config["default"]["data_directory"]}/dump/{lang}/infoboxes/*.json')
                 group by 1
             ) T
-    """
-    )
+    """)
 
     # %% Creation infobox
     con.sql(
@@ -103,8 +87,7 @@ if "infobox" in sync_list:
         infobox_id INTEGER,
         PRIMARY KEY(node_id, infobox_id)
     );
-    """
-    )
+    """)
 
     # %% Suppression des liens infobox
     con.sql("DELETE FROM infobox_node_assoc;")
@@ -114,24 +97,12 @@ if "infobox" in sync_list:
         f"""
         insert into infobox_node_assoc
         select
-        T1.id as node_id,
+        T1.article_id as node_id,
         T3.id as infobox_id
-        FROM read_csv(
-            '{config["default"]["data_directory"]}/dump/{lang}/infoboxes/*.csv',
-            delim=',',
-            header=true,
-            columns={{
-                'id': 'INTEGER',
-                'title': 'VARCHAR',
-                'infobox': 'VARCHAR'
-            }},
-            quote='|',
-            escape='',
-            ignore_errors=true
-        ) T1 left outer join nodes T2 on (T1.title = T2.title) inner join infobox_type T3 on (T1.infobox = T3.name)
+        FROM read_json('{config["default"]["data_directory"]}/dump/{lang}/infoboxes/*.json') T1 left outer join
+        nodes T2 on (T1.article_title = T2.title) inner join infobox_type T3 on (T1.infobox = T3.name)
         group by 1,2
-    """
-    )
+    """)
 
 # %% Categories
 if "category" in sync_list:
@@ -143,8 +114,7 @@ if "category" in sync_list:
         id INTEGER PRIMARY KEY,
         name VARCHAR
     );
-    """
-    )
+    """)
 
     # %% Effacement des nodes
     con.sql("DELETE from category_type")
@@ -161,22 +131,10 @@ if "category" in sync_list:
                 select
                 category,
                 count(*)
-                FROM read_csv(
-                    '{config["default"]["data_directory"]}/dump/{lang}/categories/*.csv',
-                    delim=',',
-                    header=true,
-                    columns={{
-                        'id': 'INTEGER',
-                        'title': 'VARCHAR',
-                        'category': 'VARCHAR'
-                    }},
-                    quote='|',
-                    escape=''
-                )
+                FROM read_json('{config["default"]["data_directory"]}/dump/{lang}/categories/*.json')
                 group by 1
             ) T
-    """
-    )
+    """)
 
     # %% Creation category assoc
     con.sql(
@@ -186,8 +144,7 @@ if "category" in sync_list:
         category_id INTEGER,
         PRIMARY KEY(node_id, category_id)
     );
-    """
-    )
+    """)
 
     # %% Suppression des liens category
     con.sql("DELETE FROM category_node_assoc;")
@@ -197,23 +154,14 @@ if "category" in sync_list:
         f"""
         insert into category_node_assoc
         select
-        T1.id as node_id,
+        T1.article_id as node_id,
         T3.id as category_id
-        FROM read_csv(
-            '{config["default"]["data_directory"]}/dump/{lang}/categories/*.csv',
-            delim=',',
-            header=true,
-            columns={{
-                'id': 'INTEGER',
-                'title': 'VARCHAR',
-                'category': 'VARCHAR'
-            }},
-            quote='|',
-            escape=''
-        ) T1 left outer join nodes T2 on (T1.title = T2.title) inner join category_type T3 on (T1.category = T3.name)
+        FROM
+        read_json('{config["default"]["data_directory"]}/dump/{lang}/categories/*.json') T1 left outer join
+        nodes T2 on (T1.article_title = T2.title) inner join
+        category_type T3 on (T1.category = T3.name)
         group by 1,2
-    """
-    )
+    """)
 
 # %% Portals
 if "portal" in sync_list:
@@ -225,8 +173,7 @@ if "portal" in sync_list:
         id INTEGER PRIMARY KEY,
         name VARCHAR
     );
-    """
-    )
+    """)
 
     # %% Effacement des nodes
     con.sql("DELETE from portal_type")
@@ -243,22 +190,10 @@ if "portal" in sync_list:
                 select
                 portal,
                 count(*)
-                FROM read_csv(
-                    '{config["default"]["data_directory"]}/dump/{lang}/portals/*.csv',
-                    delim=',',
-                    header=true,
-                    columns={{
-                        'id': 'INTEGER',
-                        'title': 'VARCHAR',
-                        'portal': 'VARCHAR'
-                    }},
-                    quote='|',
-                    escape=''
-                )
+                FROM read_json('{config["default"]["data_directory"]}/dump/{lang}/portals/*.json')
                 group by 1
             ) T
-    """
-    )
+    """)
 
     # %% Creation portal assoc
     con.sql(
@@ -268,8 +203,7 @@ if "portal" in sync_list:
         portal_id INTEGER,
         PRIMARY KEY(node_id, portal_id)
     );
-    """
-    )
+    """)
 
     # %% Suppression des liens portal
     con.sql("DELETE FROM portal_node_assoc;")
@@ -279,20 +213,11 @@ if "portal" in sync_list:
         f"""
         insert into portal_node_assoc
         select
-        T1.id as node_id,
+        T1.article_id as node_id,
         T3.id as portal_id
-        FROM read_csv(
-            '{config["default"]["data_directory"]}/dump/{lang}/portals/*.csv',
-            delim=',',
-            header=true,
-            columns={{
-                'id': 'INTEGER',
-                'title': 'VARCHAR',
-                'portal': 'VARCHAR'
-            }},
-            quote='|',
-            escape=''
-        ) T1 left outer join nodes T2 on (T1.title = T2.title) inner join portal_type T3 on (T1.portal = T3.name)
+        FROM
+        read_json('{config["default"]["data_directory"]}/dump/{lang}/portals/*.json') T1 left outer join
+        nodes T2 on (T1.article_title = T2.title) inner join
+        portal_type T3 on (T1.portal = T3.name)
         group by 1,2
-    """
-    )
+    """)
