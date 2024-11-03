@@ -7,7 +7,8 @@ from wikipedia import config
 
 def extraction_done(lang, dir_mask):
     """Vérifier le statut de l'extraction"""
-    dump_directory = os.path.join(config["default"]["data_directory"], "dump", lang)
+    dump_directory = os.path.join(
+        config["default"]["data_directory"], "dump", lang)
     output_directory = os.path.join(dump_directory, dir_mask)
 
     return os.path.exists(output_directory)
@@ -15,7 +16,8 @@ def extraction_done(lang, dir_mask):
 
 def batch_extract(lang, dir_mask, extract_function):
     """Extraction en masse d'un dump avec la fonction"""
-    dump_directory = os.path.join(config["default"]["data_directory"], "dump", lang)
+    dump_directory = os.path.join(
+        config["default"]["data_directory"], "dump", lang)
     output_directory = os.path.join(dump_directory, dir_mask)
 
     try:
@@ -34,7 +36,8 @@ def batch_extract(lang, dir_mask, extract_function):
 
 def batch_extract_parallel(lang, dir_mask, extract_function):
     """Extraction en masse d'un dump avec la fonction"""
-    dump_directory = os.path.join(config["default"]["data_directory"], "dump", lang)
+    dump_directory = os.path.join(
+        config["default"]["data_directory"], "dump", lang)
     output_directory = os.path.join(dump_directory, dir_mask)
 
     try:

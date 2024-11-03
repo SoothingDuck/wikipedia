@@ -5,7 +5,8 @@ from wikipedia import config
 import os
 import duckdb
 
-program_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+program_directory = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "..")
 os.chdir(program_directory)
 
 # %% Get config
@@ -25,7 +26,8 @@ if "node" in sync_list:
     CREATE TABLE IF NOT EXISTS nodes(
         id INTEGER PRIMARY KEY,
         title VARCHAR,
-        namespace INTEGER
+        namespace INTEGER,
+        text TEXT
     );
     """
     )
@@ -36,19 +38,14 @@ if "node" in sync_list:
     # %% Insertion depuis le CSV
     con.sql(
         f"""
-            insert into nodes
-            select * FROM read_csv(
-                '{config["default"]["data_directory"]}/dump/{lang}/nodes/*.csv',
-                delim=',',
-                header=true,
-                columns={{
-                    'id': 'INTEGER',
-                    'title': 'VARCHAR',
-                    'namespace': 'INTEGER'
-                }},
-                quote='|',
-                escape=''
-            )
+        insert into nodes
+        select
+        article_id,
+        article_title,
+        article_namespace,
+        article_text
+        FROM
+        read_json('{config["default"]["data_directory"]}/dump/{lang}/nodes/*.json')
     """
     )
 

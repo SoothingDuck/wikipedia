@@ -60,7 +60,7 @@ class Dump(object):
         prefix = "-".join(basename.split("-")[:4]).replace(".xml", "")
         suffix = basename.split("-")[-1].replace(".bz2", "")
 
-        return "{}.csv".format("-".join([prefix, type_filename, suffix]))
+        return "{}.json".format("-".join([prefix, type_filename, suffix]))
 
     @property
     def node_filename(self):

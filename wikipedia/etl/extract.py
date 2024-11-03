@@ -17,6 +17,8 @@ from wikipedia.etl.dump import Article
 from abc import ABC, abstractmethod
 import os
 import csv
+import json
+
 
 
 class DumpExtractor(ABC):
@@ -66,21 +68,19 @@ class DumpFileExtractor(DumpExtractor):
 
     def extract_nodes(self):
         # Nodes
-        filename_path = os.path.join(self._directory_name, self.dump.node_filename)
+        filename_path = os.path.join(
+            self._directory_name, self.dump.node_filename)
         if not os.path.exists(filename_path):
-            with open(filename_path, "w", newline="", encoding="utf-8") as csvfile:
-                nodewriter = csv.writer(
-                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
-                )
-                nodewriter.writerow(
-                    ["article_id", "article_title", "article_namespace"]
-                )
-
+            with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
                     if article.redirect_title is None:
-                        nodewriter.writerow(
-                            [article.id, article.title.strip(), article.ns]
-                        )
+                        json.dump({
+                            "article_id": article.id,
+                            "article_title": article.title.strip(),
+                            "article_namespace": article.ns,
+                            "article_text": article.text
+                        }, jsonfile)
+                        jsonfile.write("\n")
 
     def extract_redirections(self):
         # Redirections
@@ -88,9 +88,9 @@ class DumpFileExtractor(DumpExtractor):
             self._directory_name, self.dump.redirection_filename
         )
         if not os.path.exists(filename_path):
-            with open(filename_path, "w", newline="", encoding="utf-8") as csvfile:
+            with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 redirectionwriter = csv.writer(
-                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
                 )
                 redirectionwriter.writerow(
                     ["article_id", "article_title", "redirection_title"]
@@ -108,11 +108,12 @@ class DumpFileExtractor(DumpExtractor):
 
     def extract_links(self, maxlength_article_title=2000):
         # Links
-        filename_path = os.path.join(self._directory_name, self.dump.link_filename)
+        filename_path = os.path.join(
+            self._directory_name, self.dump.link_filename)
         if not os.path.exists(filename_path):
-            with open(filename_path, "w", newline="", encoding="utf-8") as csvfile:
+            with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 linkwriter = csv.writer(
-                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
                 )
                 linkwriter.writerow(["article_id", "link_title"])
 
@@ -124,14 +125,16 @@ class DumpFileExtractor(DumpExtractor):
 
     def extract_infoboxes(self):
         # Categories
-        filename_path = os.path.join(self._directory_name, self.dump.infobox_filename)
+        filename_path = os.path.join(
+            self._directory_name, self.dump.infobox_filename)
         if not os.path.exists(filename_path):
-            with open(filename_path, "w", newline="", encoding="utf-8") as csvfile:
+            with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 infoboxwriter = csv.writer(
-                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
                 )
 
-                infoboxwriter.writerow(["article_id", "article_title", "infobox"])
+                infoboxwriter.writerow(
+                    ["article_id", "article_title", "infobox"])
 
                 for article in self:
                     if article.redirect_title is None:
@@ -142,13 +145,15 @@ class DumpFileExtractor(DumpExtractor):
 
     def extract_categories(self):
         # Categories
-        filename_path = os.path.join(self._directory_name, self.dump.category_filename)
+        filename_path = os.path.join(
+            self._directory_name, self.dump.category_filename)
         if not os.path.exists(filename_path):
-            with open(filename_path, "w", newline="", encoding="utf-8") as csvfile:
+            with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 categorywriter = csv.writer(
-                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
                 )
-                categorywriter.writerow(["article_id", "article_title", "category"])
+                categorywriter.writerow(
+                    ["article_id", "article_title", "category"])
 
                 for article in self:
                     if article.redirect_title is None:
@@ -159,13 +164,15 @@ class DumpFileExtractor(DumpExtractor):
 
     def extract_portals(self):
         # Portals
-        filename_path = os.path.join(self._directory_name, self.dump.portal_filename)
+        filename_path = os.path.join(
+            self._directory_name, self.dump.portal_filename)
         if not os.path.exists(filename_path):
-            with open(filename_path, "w", newline="", encoding="utf-8") as csvfile:
+            with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 portalwriter = csv.writer(
-                    csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
+                    jsonfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL
                 )
-                portalwriter.writerow(["article_id", "article_title", "portal"])
+                portalwriter.writerow(
+                    ["article_id", "article_title", "portal"])
 
                 for article in self:
                     if article.redirect_title is None:
