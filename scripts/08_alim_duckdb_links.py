@@ -34,18 +34,7 @@ con.sql("DELETE from redirections")
 con.sql(
     f"""
         insert into redirections
-        select article_title, redirection_title FROM read_csv(
-            '{config["default"]["data_directory"]}/dump/{lang}/redirections/*.csv',
-            delim=',',
-            header=true,
-            columns={{
-                'article_id': 'INTEGER',
-                'article_title': 'VARCHAR',
-                'redirection_title': 'VARCHAR'
-            }},
-            quote='|',
-            ignore_errors=true
-        )
+        select article_title, redirection_title FROM read_json('{config["default"]["data_directory"]}/dump/{lang}/redirections/*.json')
         where
         article_title is not null
         and
@@ -76,7 +65,7 @@ con.sql("DELETE from links_nodes")
 for filename in sorted(
     glob.glob(
         os.path.join(
-            config["default"]["data_directory"], "dump", lang, "links", "*.csv"
+            config["default"]["data_directory"], "dump", lang, "links", "*.json"
         )
     )
 ):
@@ -92,36 +81,19 @@ for filename in sorted(
             select 
             T1.article_id as source_node_id,
             T2.id as destination_node_id
-            FROM read_csv(
+            FROM read_json(
                 '"""
         + filename
-        + """',
-                delim=',',
-                header=true,
-                columns={
-                    'article_id': 'INTEGER',
-                    'link_title': 'VARCHAR'
-                },
-                quote='|',
-                escape=''
-            ) T1 inner join nodes T2 on (T1.link_title = T2.title)
+        + """'
+        ) T1 inner join nodes T2 on (T1.link_title = T2.title)
             union all
-            select 
+            select
             T1.article_id as source_node_id,
             T3.id as destination_id
-            FROM read_csv(
+            FROM read_json(
                 '"""
         + filename
-        + """',
-                delim=',',
-                header=true,
-                columns={
-                    'article_id': 'INTEGER',
-                    'link_title': 'VARCHAR'
-                },
-                quote='|',
-                escape=''
-            ) T1 inner join
+        + """') T1 inner join
             redirections T2 on (T1.link_title = T2.article_title) inner join
             nodes T3 on (T2.redirection_title = T3.title)
         ) T

@@ -12,6 +12,7 @@ class Site(object):
     """
     Interactions avec le site dumps.wikimedia.org
     """
+
     def __init__(self, lang, date):
         self._lang = lang
         self._date = date
@@ -57,10 +58,12 @@ class Dump(object):
     def __filename_template(self, type_filename):
         basename = self._filename.split(os.path.sep)[-1]
 
-        prefix = "-".join(basename.split("-")[:4]).replace(".xml", "")
+        prefix = "-".join(basename.split("-")[:3]).replace(".xml", "")
         suffix = basename.split("-")[-1].replace(".bz2", "")
 
-        return "{}.json".format("-".join([prefix, type_filename, suffix]))
+        return "{}.json".format("-".join([prefix, type_filename, suffix])).replace(
+            ".xml", ""
+        )
 
     @property
     def node_filename(self):
@@ -89,19 +92,12 @@ class Dump(object):
     def __str__(self):
         return "<Dump {}>".format(self.filename)
 
+
 class Article(object):
 
     LANG = {
-        "fr" : {
-            "category" : "Catégorie",
-            "portal"   : "Portail",
-            "portal bar" : "Palette"
-        },
-        "en" : {
-            "category" : "Category",
-            "portal"   : "Portal",
-            "portal bar" : "Portal bar"
-        }
+        "fr": {"category": "Catégorie", "portal": "Portail", "portal bar": "Palette"},
+        "en": {"category": "Category", "portal": "Portal", "portal bar": "Portal bar"},
     }
 
     def __init__(self, xml, lang="en"):
@@ -178,7 +174,7 @@ class Article(object):
             if "Infobox" in template.name:
                 tmp = str(template.name).replace("Infobox", "").strip()
                 result.add(tmp.lower())
-        return(list(result))
+        return list(result)
 
     @property
     def links(self, max_length=1000):
@@ -192,7 +188,9 @@ class Article(object):
                     else:
                         link = m
 
-                    if not link.startswith("{}:".format(Article.LANG[self.lang]["category"])) and not link.startswith(
+                    if not link.startswith(
+                        "{}:".format(Article.LANG[self.lang]["category"])
+                    ) and not link.startswith(
                         "{}:".format(Article.LANG[self.lang]["portal"])
                     ):
                         if link.strip() != "" and len(link.strip()) <= max_length:
@@ -206,10 +204,18 @@ class Article(object):
             self._categories = set()
 
             if self.text is not None:
-                for m in re.findall(r"\[\[%s:(.*?)\]\]" % (Article.LANG[self.lang]["category"]), self.text):
+                for m in re.findall(
+                    r"\[\[%s:(.*?)\]\]" % (Article.LANG[self.lang]["category"]),
+                    self.text,
+                ):
                     for category in m.split("|"):
                         if category.strip() not in ["", "*"]:
-                            self._categories.add("{}:{}".format(Article.LANG[self.lang]["category"], category.strip()))
+                            self._categories.add(
+                                "{}:{}".format(
+                                    Article.LANG[self.lang]["category"],
+                                    category.strip(),
+                                )
+                            )
         return self._categories
 
     @property
@@ -219,16 +225,30 @@ class Article(object):
 
             if self.text is not None:
                 # {{Portal|Anarchism|Libertarianism}}
-                for m in re.findall(r"\{\{%s\|(.*?)\}\}" % (Article.LANG[self.lang]["portal"]), self.text):
+                for m in re.findall(
+                    r"\{\{%s\|(.*?)\}\}" % (Article.LANG[self.lang]["portal"]),
+                    self.text,
+                ):
                     for portal in m.split("|"):
                         if portal.strip() != "":
-                            self._portals.add("{}:{}".format(Article.LANG[self.lang]["portal"], portal.strip()))
+                            self._portals.add(
+                                "{}:{}".format(
+                                    Article.LANG[self.lang]["portal"], portal.strip()
+                                )
+                            )
 
                 # {{Portal bar|Biography|American Civil War|Illinois|United States|Politics|Law}}
-                for m in re.findall(r"\{\{%s\|(.*?)\}\}" % (Article.LANG[self.lang]["portal bar"]), self.text):
+                for m in re.findall(
+                    r"\{\{%s\|(.*?)\}\}" % (Article.LANG[self.lang]["portal bar"]),
+                    self.text,
+                ):
                     for portal in m.split("|"):
                         if portal.strip() != "":
-                            self._portals.add("{}:{}".format(Article.LANG[self.lang]["portal"], portal.strip()))
+                            self._portals.add(
+                                "{}:{}".format(
+                                    Article.LANG[self.lang]["portal"], portal.strip()
+                                )
+                            )
 
         return self._portals
 
