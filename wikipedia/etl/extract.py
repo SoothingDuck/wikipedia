@@ -67,18 +67,19 @@ class DumpFileExtractor(DumpExtractor):
 
     def extract_nodes(self):
         # Nodes
-        filename_path = os.path.join(
-            self._directory_name, self.dump.node_filename)
+        filename_path = os.path.join(self._directory_name, self.dump.node_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
                     if article.redirect_title is None:
-                        json.dump({
-                            "article_id": article.id,
-                            "article_title": article.title.strip(),
-                            "article_namespace": article.ns,
-                            "article_text": article.text
-                        }, jsonfile)
+                        json.dump(
+                            {
+                                "article_id": article.id,
+                                "article_title": article.title.strip(),
+                                "article_namespace": article.ns,
+                            },
+                            jsonfile,
+                        )
                         jsonfile.write("\n")
 
     def extract_redirections(self):
@@ -90,17 +91,19 @@ class DumpFileExtractor(DumpExtractor):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
                     if article.redirect_title is not None:
-                        json.dump({
-                            "article_id": article.id,
-                            "article_title": article.title.strip(),
-                            "redirection_title": article.redirect_title.strip()
-                        }, jsonfile)
+                        json.dump(
+                            {
+                                "article_id": article.id,
+                                "article_title": article.title.strip(),
+                                "redirection_title": article.redirect_title.strip(),
+                            },
+                            jsonfile,
+                        )
                         jsonfile.write("\n")
 
     def extract_links(self, maxlength_article_title=2000):
         # Links
-        filename_path = os.path.join(
-            self._directory_name, self.dump.link_filename)
+        filename_path = os.path.join(self._directory_name, self.dump.link_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
@@ -110,54 +113,61 @@ class DumpFileExtractor(DumpExtractor):
                                 json.dump(
                                     {
                                         "article_id": article.id,
-                                        "link_title": link.strip()
-                                    }, jsonfile
+                                        "link_title": link.strip(),
+                                    },
+                                    jsonfile,
                                 )
 
     def extract_infoboxes(self):
         # Categories
-        filename_path = os.path.join(
-            self._directory_name, self.dump.infobox_filename)
+        filename_path = os.path.join(self._directory_name, self.dump.infobox_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
                     if article.redirect_title is None:
                         for infobox in article.infoboxes:
-                            json.dump({
-                                "article_id": article.id,
-                                "article_title": article.title.strip(),
-                                "infobox": infobox.strip()
-                            }, jsonfile)
+                            json.dump(
+                                {
+                                    "article_id": article.id,
+                                    "article_title": article.title.strip(),
+                                    "infobox": infobox.strip(),
+                                },
+                                jsonfile,
+                            )
                             jsonfile.write("\n")
 
     def extract_categories(self):
         # Categories
-        filename_path = os.path.join(
-            self._directory_name, self.dump.category_filename)
+        filename_path = os.path.join(self._directory_name, self.dump.category_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
                     if article.redirect_title is None:
                         for category in article.categories:
-                            json.dump({
-                                "article_id": article.id,
-                                "article_title": article.title.strip(),
-                                "category": category.strip()
-                            }, jsonfile)
+                            json.dump(
+                                {
+                                    "article_id": article.id,
+                                    "article_title": article.title.strip(),
+                                    "category": category.strip(),
+                                },
+                                jsonfile,
+                            )
                             jsonfile.write("\n")
 
     def extract_portals(self):
         # Portals
-        filename_path = os.path.join(
-            self._directory_name, self.dump.portal_filename)
+        filename_path = os.path.join(self._directory_name, self.dump.portal_filename)
         if not os.path.exists(filename_path):
             with open(filename_path, "w", newline="", encoding="utf-8") as jsonfile:
                 for article in self:
                     if article.redirect_title is None:
                         for portal in article.portals:
-                            json.dump({
-                                "article_id": article.id,
-                                "article_title": article.title.strip(),
-                                "portal": portal.strip()
-                            }, jsonfile)
+                            json.dump(
+                                {
+                                    "article_id": article.id,
+                                    "article_title": article.title.strip(),
+                                    "portal": portal.strip(),
+                                },
+                                jsonfile,
+                            )
                             jsonfile.write("\n")
